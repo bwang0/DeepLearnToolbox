@@ -1,4 +1,15 @@
 function rbm = rbmtrain(rbm, x, opts)
+%  rbm - 
+%    x - observations of visible nodes, (number of observations)x(number of dimensions)
+% opts - options
+% opts.numepochs - number of rounds of going through training with x
+% opts.batchsize - number of observations per batch. 1 weight update per batch.
+% opts.momentum - large update in last iteration leads to large update in current iteration.
+%                 momentum = 0 means, no momentum effect. Higher value means greater effect 
+%                 of last iteration's update on this iteration's update
+% opts.alpha - learning rate
+
+
     assert(isfloat(x), 'x must be a float');
     m = size(x, 1);
     numbatches = m / opts.batchsize;

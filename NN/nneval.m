@@ -13,7 +13,7 @@ if nargin == 6
     loss.val.e(end + 1)   = nn.L;
 end
 
-%calc misclassification rate if softmax
+% calc misclassification rate if softmax
 if strcmp(nn.output,'softmax')
     [er_train, ~]               = nntest(nn, train_x, train_y);
     loss.train.e_frac(end+1)    = er_train;

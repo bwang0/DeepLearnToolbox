@@ -1,5 +1,5 @@
 function rbm = rbmtrain(rbm, x, opts)
-%  rbm - 
+%  rbm - rbm to be trained
 %    x - observations of visible nodes, (number of observations)x(number of dimensions)
 % opts - options
 % opts.numepochs - number of rounds of going through training with x
@@ -12,7 +12,7 @@ function rbm = rbmtrain(rbm, x, opts)
 
     assert(isfloat(x), 'x must be a float');
     m = size(x, 1);
-    numbatches = m / opts.batchsize;
+    numbatches = floor(m / opts.batchsize);
     
     assert(rem(numbatches, 1) == 0, 'numbatches not integer');
 

@@ -2,8 +2,8 @@ function [nn, L]  = nntrain(nn, train_x, train_y, opts, val_x, val_y)
 %NNTRAIN trains a neural net
 % [nn, L] = nntrain(nn, train_x, train_y, opts, val_x, val_y) 
 % trains the neural network nn with input train_x
-% and output train_y for opts.numepochs epochs, with minibatches of size
-% opts.batchsize.
+% and output train_y for opts.numepochs epochs, with minibatches of
+% size opts.batchsize.
 % 
 % If val_x and val_y are given, then nneval with nn after each epoch
 % of training.
@@ -12,11 +12,11 @@ function [nn, L]  = nntrain(nn, train_x, train_y, opts, val_x, val_y)
 % errors, weights and biases, (nn.a, nn.e, nn.W, nn.b) and L, the sum
 % squared error for each training minibatch.
 %
-% opts.plot = 1 would plot the change in error, and
+% opts.plot = 1 would plot the change in error over epochs, and
 % omission of this field means no plot.
 
 assert(isfloat(train_x), 'train_x must be a float');
-assert(nargin == 4 || nargin == 6,'number ofinput arguments must be 4 or 6')
+assert(nargin == 4 || nargin == 6,'number of input arguments must be 4 or 6')
 
 loss.train.e               = [];
 loss.train.e_frac          = [];
@@ -37,7 +37,7 @@ m = size(train_x, 1);
 batchsize = opts.batchsize;
 numepochs = opts.numepochs;
 
-numbatches = m / batchsize;
+numbatches = floor(m / batchsize);
 
 assert(rem(numbatches, 1) == 0, 'numbatches must be a integer');
 

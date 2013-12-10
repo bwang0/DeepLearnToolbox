@@ -1,0 +1,15 @@
+784->300->100->10
+Simple NN
+30 epochs, last 4 iter test error
+er = 0.0291
+er = 0.0283
+er = 0.0290
+er = 0.0292
+
+784->300->100->10
+Fully connected NN
+30 epochs,
+er = 0.0310
+er = 0.0276
+er = 0.0291
+er = 0.0282

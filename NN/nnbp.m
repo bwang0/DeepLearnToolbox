@@ -10,38 +10,62 @@ function nn = nnbp(nn)
         case {'softmax','linear'}
             d{n} = - nn.e;
     end
-    for i = (n - 1) : -1 : 2
+    
+    % weights format
+    % 1: input layer. 4: output layer. 2, 3 hidden layers.
+    %   1    2    3    4
+    % 1 0    0    0    0
+    % 2 1->2 0    0    0
+    % 3 1->3 2->3 0    0
+    % 4 1->4 2->4 3->4 0
+    for j = (n - 1) : -1 : 2
         % Derivative of the activation function
-        switch nn.activation_function 
+        switch nn.activation_function
             case 'sigm'
-                d_act = nn.a{i} .* (1 - nn.a{i});
+                d_act = nn.a{j} .* (1 - nn.a{j});
             case 'tanh_opt'
-                d_act = 1.7159 * 2/3 * (1 - 1/(1.7159)^2 * nn.a{i}.^2);
+                d_act = 1.7159 * 2/3 * (1 - 1/(1.7159)^2 * nn.a{j}.^2);
         end
         
         if(nn.nonSparsityPenalty>0)
-            pi = repmat(nn.p{i}, size(nn.a{i}, 1), 1);
-            sparsityError = [zeros(size(nn.a{i},1),1) nn.nonSparsityPenalty * (-nn.sparsityTarget ./ pi + (1 - nn.sparsityTarget) ./ (1 - pi))];
+            pi = repmat(nn.p{j}, size(nn.a{j}, 1), 1);
+            sparsityError = [zeros(size(nn.a{j},1),1) nn.nonSparsityPenalty * (-nn.sparsityTarget ./ pi + (1 - nn.sparsityTarget) ./ (1 - pi))];
         end
         
         % Backpropagate first derivatives
-        if i+1==n % in this case in d{n} there is not the bias term to be removed             
-            d{i} = (d{i + 1} * nn.W{i} + sparsityError) .* d_act; % Bishop (5.56)
-        else % in this case in d{i} the bias term has to be removed
-            d{i} = (d{i + 1}(:,2:end) * nn.W{i} + sparsityError) .* d_act;
-        end
+        d{j} = sparsityError;
+        for i = j+1 : n
+          if numel(nn.W{i,j}) == 0
+            continue;
+          end
+          
+          if i == n % in this case in d{n} there is not the bias term to be removed
+            d{j} = d{j} + d{i} * nn.W{i,j};
+          else % in this case in d{i} the bias term has to be removed
+            d{j} = d{j} + d{i}(:,2:end) * nn.W{i,j};
+          end
+        end        
+        d{j} = d{j} .* d_act;
         
+        % Dropout mask
         if(nn.dropoutFraction>0)
-            d{i} = d{i} .* [ones(size(d{i},1),1) nn.dropOutMask{i}];
+            d{j} = d{j} .* [ones(size(d{j},1),1) nn.dropOutMask{j}];
         end
-
     end
 
-    for i = 1 : (n - 1)
-        if i+1==n
-            nn.dW{i} = (d{i + 1}' * nn.a{i}) / size(d{i + 1}, 1);
-        else
-            nn.dW{i} = (d{i + 1}(:,2:end)' * nn.a{i}) / size(d{i + 1}, 1);      
+    nn.dW = cell(n);
+    batch_size = size(d{n},1);
+    for j = 1 : (n - 1)
+      for i = j+1 : n
+        if numel(nn.W) == 0
+          continue;
         end
+        
+        if i==n
+            nn.dW{i,j} = (d{i}' * nn.a{j}) / batch_size;
+        else
+            nn.dW{i,j} = (d{i}(:,2:end)' * nn.a{j}) / batch_size;
+        end
+      end
     end
 end

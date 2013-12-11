@@ -13,3 +13,8 @@ er = 0.0310
 er = 0.0276
 er = 0.0291
 er = 0.0282
+
+1) SAE/DBN/No pretrain
+2) 5 layers vs 4 layers
+3) Stage-wise vs no stage-wise
+4) Layer connection configurations
